@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DARKNOVA AI</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#121016">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside id="drawer">
+  <div class="logo">✦ DARKNOVA</div>
+  <button id="clear" class="item">✎ แชทใหม่</button>
+  <div class="label">โหมด</div>
+  <button class="item mode" data-mode="code"><b>Code</b><small>เขียน แก้ อธิบายโค้ด</small></button>
+  <button class="item mode" data-mode="plan"><b>Plan</b><small>วางแผนโปรเจกต์เป็นขั้นตอน</small></button>
+  <button class="item mode" data-mode="debug"><b>Debug</b><small>วิเคราะห์และแก้ Error</small></button>
+  <div class="spacer"></div>
+  <button id="logout" class="item" hidden><b>ออกจากระบบ</b></button>
+  <button id="scan" class="item"><b>Scan project</b><small>ตรวจโครงสร้างโปรเจกต์</small></button>
+</aside>
+<div id="scrim"></div>
+<section id="main">
+  <header>
+    <button id="menu" class="icon" aria-label="เมนู">☰</button>
+    <span class="title">DARKNOVA</span>
+    <button id="new" class="icon" aria-label="แชทใหม่">✎</button>
+  </header>
+  <div id="chat"><div id="msgs" aria-live="polite"></div></div>
+  <footer>
+    <div id="composer">
+      <textarea id="msg" rows="1" maxlength="8000"></textarea>
+      <div class="row">
+        <select id="mode" aria-label="โหมด">
+          <option value="code">Code</option><option value="plan">Plan</option><option value="debug">Debug</option>
+        </select>
+        <button id="send" aria-label="ส่ง">↑</button>
+      </div>
+    </div>
+    <p class="note">DARKNOVA AI อาจผิดพลาดได้ ตรวจสอบโค้ดก่อนใช้งานจริง</p>
+  </footer>
+</section>
+<div id="login" hidden>
+  <div class="box">
+    <div class="mark">✦</div><h2>DARKNOVA AI</h2>
+    <input id="pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button id="go">เข้าสู่ระบบ</button>
+    <p id="lerr"></p>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="app.js"></script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{})</script>
+</body>
+</html>
