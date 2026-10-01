@@ -20,15 +20,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Check Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          sdkmanager --version
+          yes | sdkmanager --licenses || true
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Create Android project
         run: |
           mkdir -p app/src/main/java/com/darknova/ai
           mkdir -p app/src/main/res/values
 
-          cat > settings.gradle <<'EOF'
+          cat > settings.gradle <<'EOF_INNER'
           pluginManagement {
               repositories {
                   google()
@@ -47,15 +54,15 @@ jobs:
 
           rootProject.name = "DARKNOVA-AI"
           include(":app")
-          EOF
+          EOF_INNER
 
-          cat > build.gradle <<'EOF'
+          cat > build.gradle <<'EOF_INNER'
           plugins {
               id 'com.android.application' version '8.7.3' apply false
           }
-          EOF
+          EOF_INNER
 
-          cat > app/build.gradle <<'EOF'
+          cat > app/build.gradle <<'EOF_INNER'
           plugins {
               id 'com.android.application'
           }
@@ -72,9 +79,9 @@ jobs:
                   versionName '1.0'
               }
           }
-          EOF
+          EOF_INNER
 
-          cat > app/src/main/res/values/styles.xml <<'EOF'
+          cat > app/src/main/res/values/styles.xml <<'EOF_INNER'
           <resources>
               <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
                   <item name="android:fontFamily">sans</item>
@@ -83,10 +90,11 @@ jobs:
                   <item name="android:navigationBarColor">#121016</item>
               </style>
           </resources>
-          EOF
+          EOF_INNER
 
-          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          cat > app/src/main/AndroidManifest.xml <<'EOF_INNER'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
               <uses-permission android:name="android.permission.INTERNET" />
 
               <application
@@ -106,27 +114,31 @@ jobs:
                       </intent-filter>
 
                   </activity>
+
               </application>
           </manifest>
-          EOF
+          EOF_INNER
 
-          cat > app/src/main/java/com/darknova/ai/MainActivity.java <<'EOF'
+          cat > app/src/main/java/com/darknova/ai/MainActivity.java <<'EOF_INNER'
           package com.darknova.ai;
 
           import android.app.Activity;
           import android.os.Bundle;
+          import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
-          import android.webkit.WebSettings;
 
           public class MainActivity extends Activity {
+
+              private WebView webView;
+
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
-                  WebView webView = new WebView(this);
-                  WebSettings settings = webView.getSettings();
+                  webView = new WebView(this);
 
+                  WebSettings settings = webView.getSettings();
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setDatabaseEnabled(true);
@@ -139,11 +151,14 @@ jobs:
 
               @Override
               public void onBackPressed() {
-                  WebView webView = (WebView) findViewById(android.R.id.content);
-                  super.onBackPressed();
+                  if (webView != null && webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
               }
           }
-          EOF
+          EOF_INNER
 
       - name: Build APK
         run: |
