@@ -22,36 +22,24 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          export ANDROID_HOME="$HOME/android-sdk"
-          export ANDROID_SDK_ROOT="$ANDROID_HOME"
-          mkdir -p "$ANDROID_HOME/cmdline-tools"
-
-          curl -L \
-            -o /tmp/cmdline-tools.zip \
-            https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
-
-          unzip -q /tmp/cmdline-tools.zip -d /tmp/android-tools
-          mv /tmp/android-tools/cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
-
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
-
-          sdkmanager --version
+          export ANDROID_HOME=$HOME/android-sdk
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
+          unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
 
       - name: Accept Android SDK Licenses
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
+          yes | sdkmanager --licenses || true
 
       - name: Install Android SDK Packages
         run: |
-          sdkmanager \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+          sdkmanager "platforms;android-35" "build-tools;34.0.0"
 
-      - name: Create Android Project
+      - name: Create Android project
         run: |
           mkdir -p app/src/main/java/com/darknova/ai
           mkdir -p app/src/main/res/values
@@ -115,7 +103,6 @@ jobs:
 
           cat > app/src/main/AndroidManifest.xml <<'EOF_INNER'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
               <uses-permission android:name="android.permission.INTERNET" />
 
               <application
@@ -135,7 +122,6 @@ jobs:
                       </intent-filter>
 
                   </activity>
-
               </application>
           </manifest>
           EOF_INNER
@@ -145,21 +131,18 @@ jobs:
 
           import android.app.Activity;
           import android.os.Bundle;
-          import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
+          import android.webkit.WebSettings;
 
           public class MainActivity extends Activity {
-
-              private WebView webView;
-
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
 
-                  webView = new WebView(this);
-
+                  WebView webView = new WebView(this);
                   WebSettings settings = webView.getSettings();
+
                   settings.setJavaScriptEnabled(true);
                   settings.setDomStorageEnabled(true);
                   settings.setDatabaseEnabled(true);
@@ -172,11 +155,8 @@ jobs:
 
               @Override
               public void onBackPressed() {
-                  if (webView != null && webView.canGoBack()) {
-                      webView.goBack();
-                  } else {
-                      super.onBackPressed();
-                  }
+                  WebView webView = (WebView) findViewById(android.R.id.content);
+                  super.onBackPressed();
               }
           }
           EOF_INNER
